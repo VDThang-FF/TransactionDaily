@@ -111,11 +111,12 @@ namespace VDT.TransactionDaily.API.BL.Implements
 
             // Gán cookie đăng nhập
 #if DEBUG
-            Converter.AddCookie(currentResponse, CookieKey.RefreshToken, Converter.EncryptAES(userToken.RefreshToken), domain: "http://localhost:3000");
-            Converter.AddCookie(currentResponse, CookieKey.AccessToken, Converter.EncryptAES(userToken.AccessToken), domain: "http://localhost:3000");
-            Converter.AddCookie(currentResponse, CookieKey.UserID, Converter.EncryptAES(findByUserName.Id.ToString()), domain: "http://localhost:3000");
-            Converter.AddCookie(currentResponse, CookieKey.UserName, Converter.EncryptAES(findByUserName.UserName), domain: "http://localhost:3000");
-            Converter.AddCookie(currentResponse, CookieKey.Email, Converter.EncryptAES(findByUserName.Email), domain: "http://localhost:3000");
+            var domainUI = _configService.GetAppSetting("DomainUI");
+            Converter.AddCookie(currentResponse, CookieKey.RefreshToken, Converter.EncryptAES(userToken.RefreshToken), domain: domainUI);
+            Converter.AddCookie(currentResponse, CookieKey.AccessToken, Converter.EncryptAES(userToken.AccessToken), domain: domainUI);
+            Converter.AddCookie(currentResponse, CookieKey.UserID, Converter.EncryptAES(findByUserName.Id.ToString()), domain: domainUI);
+            Converter.AddCookie(currentResponse, CookieKey.UserName, Converter.EncryptAES(findByUserName.UserName), domain: domainUI);
+            Converter.AddCookie(currentResponse, CookieKey.Email, Converter.EncryptAES(findByUserName.Email), domain: domainUI);
 #endif
 
             Converter.AddCookie(currentResponse, CookieKey.RefreshToken, Converter.EncryptAES(userToken.RefreshToken));
@@ -124,7 +125,7 @@ namespace VDT.TransactionDaily.API.BL.Implements
             Converter.AddCookie(currentResponse, CookieKey.UserName, Converter.EncryptAES(findByUserName.UserName));
             Converter.AddCookie(currentResponse, CookieKey.Email, Converter.EncryptAES(findByUserName.Email));
 
-            return res;
+            return res.OnSuccess(userToken);
         }
     }
 }

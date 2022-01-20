@@ -42,5 +42,7 @@
             get;
             set;
         } = true;
+        public double ExpireAccessToken { get; set; }
+        public double ExpireRefreshToken { get; set; }
     }
 }

@@ -7,24 +7,43 @@ namespace VDT.TransactionDaily.API.JWT
 {
     public static class JwtHelpers
     {
-        public static IEnumerable<Claim> GetClaims(this UserTokens userAccounts, Guid Id)
+        /// <summary>
+        /// Lấy thông tin claims
+        /// </summary>
+        /// <param name="userAccounts"></param>
+        /// <param name="Id"></param>
+        /// <param name="expires"></param>
+        /// <returns></returns>
+        public static IEnumerable<Claim> GetClaims(this UserTokens userAccounts, Guid Id, DateTime expires)
         {
             IEnumerable<Claim> claims = new Claim[] {
                 new Claim("Id", userAccounts.Id.ToString()),
                     new Claim(ClaimTypes.Name, userAccounts.UserName),
                     new Claim(ClaimTypes.Email, userAccounts.Email),
                     new Claim(ClaimTypes.NameIdentifier, Id.ToString()),
-                    new Claim(ClaimTypes.Expiration, DateTime.UtcNow.AddDays(1).ToString("MMM ddd dd yyyy HH:mm:ss tt"))
+                    new Claim(ClaimTypes.Expiration, expires.ToString("MMM ddd dd yyyy HH:mm:ss tt")),
+                    new Claim(ClaimTypes.Expired, expires.ToString("MMM ddd dd yyyy HH:mm:ss tt"))
             };
             return claims;
         }
 
-        public static IEnumerable<Claim> GetClaims(this UserTokens userAccounts, out Guid Id)
+        /// <summary>
+        /// Lấy thông tin claims
+        /// </summary>
+        /// <param name="userAccounts"></param>
+        /// <param name="Id"></param>
+        /// <param name="expires"></param>
+        /// <returns></returns>
+        public static IEnumerable<Claim> GetClaims(this UserTokens userAccounts, out Guid Id, DateTime expires)
         {
             Id = Guid.NewGuid();
-            return GetClaims(userAccounts, Id);
+            return GetClaims(userAccounts, Id, expires);
         }
 
+        /// <summary>
+        /// Lấy refresh token
+        /// </summary>
+        /// <returns></returns>
         public static string GenRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -35,6 +54,13 @@ namespace VDT.TransactionDaily.API.JWT
             }
         }
 
+        /// <summary>
+        /// Lấy access token
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="jwtSettings"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public static UserTokens GenAccessToken(UserTokens model, JwtSettings jwtSettings)
         {
             try
@@ -47,17 +73,25 @@ namespace VDT.TransactionDaily.API.JWT
                 // Get secret key
                 var key = System.Text.Encoding.ASCII.GetBytes(jwtSettings.IssuerSigningKey);
                 var Id = Guid.Empty;
-                var expireTime = DateTime.UtcNow.AddDays(1);
-                var _jwtoken = new JwtSecurityToken(issuer: jwtSettings.ValidIssuer, audience: jwtSettings.ValidAudience, claims: GetClaims(model, out Id), notBefore: new DateTimeOffset(DateTime.Now).DateTime, expires: new DateTimeOffset(expireTime).DateTime, signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256));
+                var expireTimeAccessToken = DateTime.UtcNow.AddSeconds(jwtSettings.ExpireAccessToken);
+                var expireTimeRefreshToken = DateTime.UtcNow.AddSeconds(jwtSettings.ExpireRefreshToken);
+                var _jwtoken = new JwtSecurityToken(
+                    issuer: jwtSettings.ValidIssuer,
+                    audience: jwtSettings.ValidAudience,
+                    claims: GetClaims(model, out Id, expireTimeAccessToken),
+                    expires: expireTimeAccessToken,
+                    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256));
+
                 userToken.AccessToken = new JwtSecurityTokenHandler().WriteToken(_jwtoken);
                 userToken.RefreshToken = GenRefreshToken();
-                userToken.Validaty = expireTime.TimeOfDay;
+                userToken.Validaty = expireTimeAccessToken.TimeOfDay;
                 userToken.UserName = model.UserName;
                 userToken.Id = model.Id;
                 userToken.GuidId = Id;
                 userToken.Email = model.Email;
-                userToken.ExpiredTime = expireTime;
-                userToken.RefreshExpiredTime = expireTime.AddDays(6);
+                userToken.ExpiredTime = expireTimeAccessToken;
+                userToken.RefreshExpiredTime = expireTimeRefreshToken;
 
                 return userToken;
             }
@@ -67,27 +101,42 @@ namespace VDT.TransactionDaily.API.JWT
             }
         }
 
-        public static ClaimsPrincipal GetPrincipalFromExpiredToken(string token, IConfiguration configuration)
+        /// <summary>
+        /// Validate access token
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="jwtSettings"></param>
+        /// <returns></returns>
+        /// <exception cref="SecurityTokenException"></exception>
+        public static bool GetPrincipalFromExpiredToken(string token, JwtSettings jwtSettings)
         {
-            var bindJwtSettings = new JwtSettings();
-            configuration.Bind("JsonWebTokenKeys", bindJwtSettings);
-            var tokenValidationParameters = new TokenValidationParameters
+            try
             {
-                ValidateAudience = bindJwtSettings.ValidateAudience,
-                ValidateIssuer = bindJwtSettings.ValidateIssuer,
-                ValidateIssuerSigningKey = bindJwtSettings.ValidateIssuerSigningKey,
-                IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(bindJwtSettings.IssuerSigningKey)),
-                ValidateLifetime = bindJwtSettings.ValidateLifetime,
-                RequireExpirationTime = bindJwtSettings.RequireExpirationTime
-            };
-            var tokenHandler = new JwtSecurityTokenHandler();
-            SecurityToken securityToken;
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
-            var jwtSecurityToken = securityToken as JwtSecurityToken;
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new SecurityTokenException("Invalid token");
+                var tokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = jwtSettings.ValidateAudience,
+                    ValidAudience = jwtSettings.ValidAudience,
+                    ValidateIssuer = jwtSettings.ValidateIssuer,
+                    ValidIssuer = jwtSettings.ValidIssuer,
+                    ValidateIssuerSigningKey = jwtSettings.ValidateIssuerSigningKey,
+                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings.IssuerSigningKey)),
+                    ValidateLifetime = jwtSettings.ValidateLifetime,
+                    RequireExpirationTime = jwtSettings.RequireExpirationTime,
+                    ClockSkew = TimeSpan.Zero,
+                };
+                var tokenHandler = new JwtSecurityTokenHandler();
+                SecurityToken securityToken;
+                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
+                var jwtSecurityToken = securityToken as JwtSecurityToken;
+                if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                    throw new SecurityTokenException("Invalid token");
+            }
+            catch (Exception)
+            {
+                return false;
+            }
 
-            return principal;
+            return true;
         }
     }
 }
