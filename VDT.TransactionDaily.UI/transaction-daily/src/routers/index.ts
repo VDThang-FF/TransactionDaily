@@ -1,12 +1,26 @@
 import { createWebHistory, createRouter } from "vue-router";
 import LayoutEmpty from '@/layouts/layout-empty.vue';
 import LayoutAuthen from '@/layouts/layout-authen.vue';
+import LayoutMain from '@/layouts/layout-main.vue';
 
 const history = createWebHistory();
 
 const router = createRouter({
     history: history,
     routes: [
+        {
+            path: '/',
+            name: 'DashBoardLayout',
+            component: LayoutMain,
+            redirect: { name: 'DashBoard' },
+            children: [
+                {
+                    path: '',
+                    name: 'DashBoard',
+                    component: () => import('@/views/dash-board/index.vue')
+                }
+            ]
+        },
         {
             path: '/login',
             name: 'LoginPageLayout',

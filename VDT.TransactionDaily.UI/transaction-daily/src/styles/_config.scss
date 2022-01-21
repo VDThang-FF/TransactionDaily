@@ -1,0 +1,31 @@
+$directions: top, right, bottom, left;
+
+// Cấu hình top/left/right/bottom
+@each $direction in $directions {
+    @for $size from 0 through 100 {
+        .vdt-#{$direction}-#{$size} {
+            #{$direction}: calc(4px * $size) !important;
+        }
+    }
+}
+
+// Cấu hình border radius full direction
+@for $size from 0 through 100 {
+    .vdt-border-#{$size} {
+        border-radius: calc(4px * $size) !important;
+    }
+}
+
+// Cấu hình chiều cao
+@for $size from 0 through 100 {
+    .vdt-height-#{$size} {
+        height: calc(4px * $size) !important;
+    }
+}
+
+// Cấu hình chiều rộng
+@for $size from 0 through 100 {
+    .vdt-width-#{$size} {
+        width: calc(4px * $size) !important;
+    }
+}

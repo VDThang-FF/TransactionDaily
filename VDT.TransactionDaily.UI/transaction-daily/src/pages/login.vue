@@ -1,47 +1,6 @@
-<script setup lang="ts">
-import { reactive, ref } from 'vue';
-import { useVuelidate } from "@vuelidate/core";
-import { required } from "@vuelidate/validators";
-import InputText from 'primevue/inputtext';
-import Password from 'primevue/password';
-import Button from 'primevue/button';
-import AccountAPIS from '../services/accounts';
-import UserLogin from '../models/UserLogin';
-
-const accountAPIS = new AccountAPIS('Accounts');
-const submitted = ref(false);
-
-const state = reactive({
-    _userName: '',
-    _passWord: ''
-});
-
-const rules = {
-    _userName: { required },
-    _passWord: { required }
-};
-
-const v$ = useVuelidate(rules, state);
-
-const submitLogin = (isFormValid: Boolean) => {
-    submitted.value = true;
-    if (!isFormValid)
-        return;
-
-    const userLogin = {
-        UserName: state._userName,
-        Password: state._passWord
-    } as UserLogin;
-
-    accountAPIS.login(userLogin).then((response) => {
-        console.log(response);
-    })
-};
-
-</script>
-
 <template>
-    <div class="bg-white w-3 p-4 border-round">
+    <Toast position="top-center" />
+    <div class="bg-white w-full p-4 vdt-border-1 lg:w-3">
         <p class="text-center text-primary font-bold text-xl mb-6">TRANSACTION DAILY</p>
         <form @submit.prevent="submitLogin(!v$.$invalid)" class="p-fluid">
             <div class="p-float-label mb-5">
@@ -73,10 +32,73 @@ const submitLogin = (isFormValid: Boolean) => {
                 v-if="(v$._passWord.$invalid && submitted)"
                 class="p-error -mt-4"
             >Mật khẩu không được để trống</p>
-            <Button class="w-full mb-5" label="Đăng nhập" type="submit" />
+            <Button class="w-full mb-5" label="Đăng nhập" type="submit" :loading="loading" />
         </form>
     </div>
 </template>
+
+<script setup lang="ts">
+import { reactive, ref } from 'vue';
+import { useVuelidate } from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
+import InputText from 'primevue/inputtext';
+import Password from 'primevue/password';
+import Button from 'primevue/button';
+import Toast from 'primevue/toast';
+import { useToast } from "primevue/usetoast";
+import { useRouter } from 'vue-router';
+import AccountAPIS from '../services/accounts';
+import UserLogin from '../models/UserLogin';
+import ServiceResponse from '../models/ServiceResponse';
+
+// Khởi tạo API Service
+const accountAPIS = new AccountAPIS('Accounts');
+
+// Khởi tạo param
+const submitted = ref(false);
+const loading = ref(false);
+const router = useRouter();
+const toast = useToast();
+
+const state = reactive({
+    _userName: '',
+    _passWord: ''
+});
+
+const rules = {
+    _userName: { required },
+    _passWord: { required }
+};
+
+const v$ = useVuelidate(rules, state);
+
+// Submit form đăng nhập
+const submitLogin = (isFormValid: Boolean) => {
+    loading.value = true;
+    submitted.value = true;
+    if (!isFormValid){
+        loading.value = false;
+        return;
+    }
+
+    const userLogin: UserLogin = {
+        UserName: state._userName,
+        Password: state._passWord
+    };
+
+    accountAPIS.login(userLogin).then((response) => {
+        const responseData: ServiceResponse = response.data;
+        if (responseData && responseData.Success) {
+            // Điều hướng vào màn hình chính
+            router.push({ name: 'DashBoard' });
+        } else {
+            toast.add({ severity: 'error', summary: 'Đăng nhập thất bại', detail: responseData.Message, life: 3000 });
+        }
+        loading.value = false;
+    })
+};
+
+</script>
 
 <style lang="scss">
 .vdt-password {

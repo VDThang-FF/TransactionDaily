@@ -6,7 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddJWTTokenServices(builder.Configuration);
-builder.Services.AddControllers();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions((options) =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 
 // Add configuring Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
