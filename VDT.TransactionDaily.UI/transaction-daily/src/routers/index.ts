@@ -18,6 +18,21 @@ const router = createRouter({
                     path: '',
                     name: 'DashBoard',
                     component: () => import('@/views/dash-board/index.vue')
+                },
+                {
+                    path: '/transaction',
+                    name: 'Transaction',
+                    component: () => import('@/views/transaction/index.vue')
+                },
+                {
+                    path: '/product',
+                    name: 'Product',
+                    component: () => import('@/views/product/index.vue')
+                },
+                {
+                    path: '/dictionary',
+                    name: 'Dictionary',
+                    component: () => import('@/views/dictionary/index.vue')
                 }
             ]
         },

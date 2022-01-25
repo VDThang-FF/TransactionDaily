@@ -23,6 +23,12 @@ const ENUM = {
         ErrorNotFound: 404,
         ErrorInvalid: 405,
         Exception: 1000
+    },
+
+    ModelState: {
+        None: 0,
+        Insert: 1,
+        Update: 2
     }
 }
 

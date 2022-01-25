@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace VDT.TransactionDaily.API.Models
 {
@@ -16,11 +17,16 @@ namespace VDT.TransactionDaily.API.Models
         /// <summary>
         /// Khóa chính
         /// </summary>
+        [Key]
         public uint Id { get; set; }
         /// <summary>
         /// ID người dùng
         /// </summary>
         public uint UserId { get; set; }
+        /// <summary>
+        /// ID danh mục
+        /// </summary>
+        public uint DictonaryId { get; set; }
         /// <summary>
         /// Mã sản phẩm
         /// </summary>
@@ -54,6 +60,7 @@ namespace VDT.TransactionDaily.API.Models
         /// </summary>
         public string? ModifiedBy { get; set; }
 
+        public virtual VdtProductDictionary Dictonary { get; set; } = null!;
         public virtual VdtUser User { get; set; } = null!;
         public virtual ICollection<VdtTransactionDetail> VdtTransactionDetails { get; set; }
     }

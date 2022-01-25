@@ -1,11 +1,14 @@
 import axios, { AxiosInstance } from "axios";
+import router from '../routers';
+
 const _baseURL = import.meta.env.VITE_BASE_API_URL.toString();
 const _timeOut = import.meta.env.VITE_BASE_API_TIMEOUT;
 
 const _httpClient: AxiosInstance = axios.create({
     baseURL: _baseURL,
     headers: {
-        "Content-type": "application/json",
+        'Access-Control-Allow-Origin': '*',
+        "Content-type": "application/json"
     },
     timeout: _timeOut,
     validateStatus: function (status) {
@@ -13,11 +16,13 @@ const _httpClient: AxiosInstance = axios.create({
     },
 });
 
+_httpClient.defaults.withCredentials = false;
+
 // Cấu hình response điều hướng
-_httpClient.interceptors.request.use(
+_httpClient.interceptors.response.use(
     function (response) {
-        if (response.status == 401) {
-            window.location.href = '/login';
+        if (response.status == 401 || response.data.Code == 401) {
+            router.push({ name: 'LoginPage' });
             return;
         }
         if (response.status == 403) {

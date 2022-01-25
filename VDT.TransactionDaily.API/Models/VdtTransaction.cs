@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace VDT.TransactionDaily.API.Models
 {
     /// <summary>
     /// Bảng thực hiện lưu trữ thông tin đơn hàng
     /// </summary>
-    public partial class VdtTransaction
+    public partial class VdtTransaction : BaseModel
     {
         public VdtTransaction()
         {
@@ -16,6 +17,7 @@ namespace VDT.TransactionDaily.API.Models
         /// <summary>
         /// Khóa chính
         /// </summary>
+        [Key]
         public uint Id { get; set; }
         /// <summary>
         /// ID người dùng

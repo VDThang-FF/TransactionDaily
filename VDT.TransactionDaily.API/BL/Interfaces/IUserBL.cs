@@ -20,5 +20,12 @@ namespace VDT.TransactionDaily.API.BL.Interfaces
         /// <returns></returns>
         /// created by vdthang 19.01.2022
         ServiceResponse Login(UserLogin loginModel);
+
+        /// <summary>
+        /// Lấy thông tin người dùng
+        /// </summary>
+        /// <returns></returns>
+        /// created by vdthang 21.01.2022
+        VdtUser UserInfo();
     }
 }

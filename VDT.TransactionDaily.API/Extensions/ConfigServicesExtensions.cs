@@ -64,6 +64,8 @@ namespace VDT.TransactionDaily.API.Extensions
             Services.AddTransient(typeof(IBaseBL<>), typeof(BaseBL<>));
             Services.AddTransient<IUserBL, UserBL>();
             Services.AddTransient<IProductBL, ProductBL>();
+            Services.AddTransient<IProductDictionayBL, ProductDictionaryBL>();
+            Services.AddTransient<ISessionBL, SessionBL>();
         }
     }
 }

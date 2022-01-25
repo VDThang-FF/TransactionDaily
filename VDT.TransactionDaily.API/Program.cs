@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VDT.TransactionDaily.API.Extensions;
+using VDT.TransactionDaily.API.Middlewares;
 using VDT.TransactionDaily.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,8 @@ builder.Services.AddCors(p => p.AddPolicy("configcors", builder =>
 
 var app = builder.Build();
 
+StartupParameter.Environment = app.Environment.EnvironmentName;
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -62,6 +65,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("configcors");
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<RequestHeaderMiddleware>();
 
 app.UseAuthorization();
 

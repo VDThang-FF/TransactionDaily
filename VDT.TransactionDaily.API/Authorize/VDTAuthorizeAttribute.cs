@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using VDT.TransactionDaily.API.Extensions;
 using VDT.TransactionDaily.API.JWT;
 using VDT.TransactionDaily.API.Models.Responses;
 using static VDT.TransactionDaily.API.Models.Enums.Enumarations;
@@ -43,6 +44,8 @@ namespace VDT.TransactionDaily.API.Authorize
                     .OnError(Code.Unauthorize, SubCode.ErrorAuthorize));
                 return;
             }
+
+            StartupParameter.AccessToken = token;
         }
     }
 }

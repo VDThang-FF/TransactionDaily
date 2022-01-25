@@ -22,17 +22,12 @@
             get;
             set;
         }
-        public Guid Id
+        public uint Id
         {
             get;
             set;
         }
         public string Email
-        {
-            get;
-            set;
-        }
-        public Guid GuidId
         {
             get;
             set;

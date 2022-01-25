@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace VDT.TransactionDaily.API.Models
 {
-    public partial class VdtContext : DbContext
+    public partial class u158751192_STMNAContext : DbContext
     {
-        public VdtContext()
+        public u158751192_STMNAContext()
         {
         }
 
-        public VdtContext(DbContextOptions<VdtContext> options)
+        public u158751192_STMNAContext(DbContextOptions<u158751192_STMNAContext> options)
             : base(options)
         {
         }
@@ -22,6 +22,15 @@ namespace VDT.TransactionDaily.API.Models
         public virtual DbSet<VdtTransactionDetail> VdtTransactionDetails { get; set; } = null!;
         public virtual DbSet<VdtUser> VdtUsers { get; set; } = null!;
         public virtual DbSet<VdtUserSession> VdtUserSessions { get; set; } = null!;
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseMySql("server=185.210.145.52;database=u158751192_STMNA;user=u158751192_vdthang;password=12345678@Abc", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.5.12-mariadb"));
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

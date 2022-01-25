@@ -40,6 +40,25 @@ namespace VDT.TransactionDaily.API.Helper
         }
 
         /// <summary>
+        /// Convert dữ liệu từ DBNull Value
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// created by vdthang 21.01.2022
+        public static T ConvertFromDBVal<T>(object value)
+        {
+            if (value == null || value == DBNull.Value)
+            {
+                return default(T);
+            }
+            else
+            {
+                return (T)value;
+            }
+        }
+
+        /// <summary>
         /// Thực hiện serialize object
         /// </summary>
         /// <param name="originObj"></param>
@@ -245,13 +264,14 @@ namespace VDT.TransactionDaily.API.Helper
         /// <param name="sameSiteMode"></param>
         /// <param name="expire"></param>
         /// <param name="domain"></param>
+        /// <param name="secure"></param>
         /// created by vdthang 17.01.2022
-        public static void AddCookie(HttpResponse response, string cookieName, string cookieValue, bool httpOnly = true, SameSiteMode sameSiteMode = SameSiteMode.Lax, DateTime? expire = null, string domain = null)
+        public static void AddCookie(HttpResponse response, string cookieName, string cookieValue, bool httpOnly = true, SameSiteMode sameSiteMode = SameSiteMode.Lax, DateTime? expire = null, string domain = null, bool secure = true)
         {
             var option = new CookieOptions()
             {
                 HttpOnly = httpOnly,
-                Secure = true,
+                Secure = secure,
                 SameSite = sameSiteMode
             };
             if (expire.HasValue)

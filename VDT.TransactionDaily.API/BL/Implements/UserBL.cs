@@ -81,7 +81,7 @@ namespace VDT.TransactionDaily.API.BL.Implements
                 {
                     UserName = loginModel.UserName,
                     Email = findByUserName.Email,
-                    Id = Guid.NewGuid()
+                    Id = findByUserName.Id
                 },
                 _jwtSettings
             );
@@ -93,39 +93,61 @@ namespace VDT.TransactionDaily.API.BL.Implements
 
             var sessionModel = new VdtUserSession()
             {
+#if DEBUG
+                Id = new Guid("00000000-0000-0000-0000-000000000001"),
+#else
+                Id = Guid.NewGuid(),
+#endif
                 UserId = findByUserName.Id,
                 LoginDay = DateTime.UtcNow,
-                DeviceID = Guid.Parse(deviceID),
-                OS = Network.GetOSName(curentRequest),
+                DeviceId = Guid.Parse(deviceID),
+                Os = Network.GetOSName(curentRequest),
                 Browser = Network.GetBrowser(curentRequest),
                 ClientIp = Network.GetClientIP(curentRequest),
                 AccessToken = userToken.AccessToken,
                 RefreshToken = userToken.RefreshToken,
-                RefreshTokenExpireTime = userToken.RefreshExpiredTime
+                RefreshTokenExpireTime = userToken.RefreshExpiredTime,
+                CreatedBy = loginModel.UserName,
+                CreatedDate = DateTime.UtcNow
             };
 
+#if DEBUG
+            var exists = _dbContext.VdtUserSessions.Any(p => p.Id == sessionModel.Id);
+            if (exists)
+            {
+                sessionModel.ModifiedBy = "vdthang";
+                sessionModel.ModifiedDate = DateTime.UtcNow;
+                _dbContext.VdtUserSessions.Update(sessionModel);
+            }
+            else
+            {
+                _dbContext.VdtUserSessions.Add(sessionModel);
+            }
+#else
+
             _dbContext.VdtUserSessions.Add(sessionModel);
+#endif
             var effectInsert = _dbContext.SaveChanges();
             if (effectInsert <= 0)
                 return res.OnError(Code.Success, SubCode.ErrorInsert, devMessage: "Không thêm mới được bản ghi session");
 
             // Gán cookie đăng nhập
-#if DEBUG
-            var domainUI = _configService.GetAppSetting("DomainUI");
-            Converter.AddCookie(currentResponse, CookieKey.RefreshToken, Converter.EncryptAES(userToken.RefreshToken), domain: domainUI);
-            Converter.AddCookie(currentResponse, CookieKey.AccessToken, Converter.EncryptAES(userToken.AccessToken), domain: domainUI);
-            Converter.AddCookie(currentResponse, CookieKey.UserID, Converter.EncryptAES(findByUserName.Id.ToString()), domain: domainUI);
-            Converter.AddCookie(currentResponse, CookieKey.UserName, Converter.EncryptAES(findByUserName.UserName), domain: domainUI);
-            Converter.AddCookie(currentResponse, CookieKey.Email, Converter.EncryptAES(findByUserName.Email), domain: domainUI);
-#endif
-
-            Converter.AddCookie(currentResponse, CookieKey.RefreshToken, Converter.EncryptAES(userToken.RefreshToken));
-            Converter.AddCookie(currentResponse, CookieKey.AccessToken, Converter.EncryptAES(userToken.AccessToken));
+            Converter.AddCookie(currentResponse, CookieKey.SessionID, Converter.EncryptAES(sessionModel.Id.ToString()));
             Converter.AddCookie(currentResponse, CookieKey.UserID, Converter.EncryptAES(findByUserName.Id.ToString()));
             Converter.AddCookie(currentResponse, CookieKey.UserName, Converter.EncryptAES(findByUserName.UserName));
             Converter.AddCookie(currentResponse, CookieKey.Email, Converter.EncryptAES(findByUserName.Email));
 
             return res.OnSuccess(userToken);
+        }
+
+        /// <summary>
+        /// Lấy thông tin người dùng
+        /// </summary>
+        /// <returns></returns>
+        /// created by vdthang 21.01.2022
+        public VdtUser UserInfo()
+        {
+            return _authService.GetUserInfo();
         }
     }
 }

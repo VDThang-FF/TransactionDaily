@@ -68,5 +68,28 @@ namespace VDT.TransactionDaily.API.Controllers
 
             return res;
         }
+
+        /// <summary>
+        /// API lấy thông tin người dùng
+        /// </summary>
+        /// <returns></returns>
+        /// created by vdthang 21.01.2022
+        [HttpGet("Info")]
+        [VDTAuthorize]
+        public ServiceResponse UserInfo()
+        {
+            var res = new ServiceResponse();
+
+            try
+            {
+                res.Data = _userBL.UserInfo();
+            }
+            catch (Exception ex)
+            {
+                res.OnError(Code.Failure, SubCode.Exception, ex);
+            }
+
+            return res;
+        }
     }
 }

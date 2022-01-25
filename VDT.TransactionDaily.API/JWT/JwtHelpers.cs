@@ -11,16 +11,15 @@ namespace VDT.TransactionDaily.API.JWT
         /// Lấy thông tin claims
         /// </summary>
         /// <param name="userAccounts"></param>
-        /// <param name="Id"></param>
         /// <param name="expires"></param>
         /// <returns></returns>
-        public static IEnumerable<Claim> GetClaims(this UserTokens userAccounts, Guid Id, DateTime expires)
+        public static IEnumerable<Claim> GetClaimDetails(this UserTokens userAccounts, DateTime expires)
         {
             IEnumerable<Claim> claims = new Claim[] {
                 new Claim("Id", userAccounts.Id.ToString()),
                     new Claim(ClaimTypes.Name, userAccounts.UserName),
                     new Claim(ClaimTypes.Email, userAccounts.Email),
-                    new Claim(ClaimTypes.NameIdentifier, Id.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, userAccounts.Id.ToString()),
                     new Claim(ClaimTypes.Expiration, expires.ToString("MMM ddd dd yyyy HH:mm:ss tt")),
                     new Claim(ClaimTypes.Expired, expires.ToString("MMM ddd dd yyyy HH:mm:ss tt"))
             };
@@ -31,13 +30,11 @@ namespace VDT.TransactionDaily.API.JWT
         /// Lấy thông tin claims
         /// </summary>
         /// <param name="userAccounts"></param>
-        /// <param name="Id"></param>
         /// <param name="expires"></param>
         /// <returns></returns>
-        public static IEnumerable<Claim> GetClaims(this UserTokens userAccounts, out Guid Id, DateTime expires)
+        public static IEnumerable<Claim> GetClaims(this UserTokens userAccounts, DateTime expires)
         {
-            Id = Guid.NewGuid();
-            return GetClaims(userAccounts, Id, expires);
+            return GetClaimDetails(userAccounts, expires);
         }
 
         /// <summary>
@@ -78,7 +75,7 @@ namespace VDT.TransactionDaily.API.JWT
                 var _jwtoken = new JwtSecurityToken(
                     issuer: jwtSettings.ValidIssuer,
                     audience: jwtSettings.ValidAudience,
-                    claims: GetClaims(model, out Id, expireTimeAccessToken),
+                    claims: GetClaims(model, expireTimeAccessToken),
                     expires: expireTimeAccessToken,
                     signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256));
@@ -88,7 +85,6 @@ namespace VDT.TransactionDaily.API.JWT
                 userToken.Validaty = expireTimeAccessToken.TimeOfDay;
                 userToken.UserName = model.UserName;
                 userToken.Id = model.Id;
-                userToken.GuidId = Id;
                 userToken.Email = model.Email;
                 userToken.ExpiredTime = expireTimeAccessToken;
                 userToken.RefreshExpiredTime = expireTimeRefreshToken;
@@ -137,6 +133,19 @@ namespace VDT.TransactionDaily.API.JWT
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Đọc thông số access token
+        /// </summary>
+        /// <param name="accessToken"></param>
+        /// <returns></returns>
+        /// created by vdthang 21.01.2022
+        public static JwtSecurityToken ReadToken(string accessToken)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jsonToken = tokenHandler.ReadJwtToken(accessToken);
+            return jsonToken;
         }
     }
 }

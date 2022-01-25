@@ -14,6 +14,14 @@ class AccountAPIS extends BaseAPIS {
     login(data: any): Promise<any> {
         return _httpClient.post(this._subAPIUrl + "/Login", data);
     }
+
+    /**
+     * API thông tin người dùng
+     * created by vdthang 21.01.2022
+     */
+    info(): Promise<any> {
+        return _httpClient.get(this._subAPIUrl + "/Info");
+    }
 }
 
 export default AccountAPIS;

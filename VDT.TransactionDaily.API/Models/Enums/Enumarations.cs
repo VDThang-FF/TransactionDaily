@@ -11,6 +11,8 @@
             public static string UserID = "UserID";
             public static string UserName = "UserName";
             public static string Email = "Email";
+            public static string Authorization = "Authorization";
+            public static string SessionID = "SessionID";
             public static string AccessToken = "AccessToken";
             public static string RefreshToken = "RefreshToken";
             public static string DeviceID = "DeviceID";

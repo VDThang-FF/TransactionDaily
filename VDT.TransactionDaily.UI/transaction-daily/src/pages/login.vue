@@ -90,7 +90,7 @@ const submitLogin = (isFormValid: Boolean) => {
         const responseData: ServiceResponse = response.data;
         if (responseData && responseData.Success) {
             // Điều hướng vào màn hình chính
-            router.push({ name: 'DashBoard' });
+            router.push({ name: 'Product' });
         } else {
             toast.add({ severity: 'error', summary: 'Đăng nhập thất bại', detail: responseData.Message, life: 3000 });
         }

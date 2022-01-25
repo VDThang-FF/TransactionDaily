@@ -1,9 +1,7 @@
-import ENUM from '@/scripts/enums';
-
 export default interface ServiceResponse {
-    Success: boolean = true,
-    Code: int = ENUM.Code.Success,
-    SubCode: int = ENUM.SubCode.Success,
+    Success: boolean,
+    Code: int,
+    SubCode: int,
     Data: object,
     Message: string,
     DevMessage: string

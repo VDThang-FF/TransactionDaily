@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using VDT.TransactionDaily.API.BL.Interfaces;
 using VDT.TransactionDaily.API.Models;
+using VDT.TransactionDaily.API.Models.Enums;
 using VDT.TransactionDaily.API.Models.Responses;
 using static VDT.TransactionDaily.API.Models.Enums.Enumarations;
 
@@ -20,9 +21,21 @@ namespace VDT.TransactionDaily.API.Controllers
         /// <returns></returns>
         /// created by vdthang 19.01.2022
         [HttpPost]
-        public ServiceResponse Insert([FromBody] object insertModel)
+        public ServiceResponse Insert([FromBody] T insertModel)
         {
-            return new ServiceResponse();
+            var res = new ServiceResponse();
+
+            try
+            {
+                insertModel.ModelState = Enumarations.ModelState.Insert;
+                res = BL.Insert(insertModel);
+            }
+            catch (Exception ex)
+            {
+                res.OnError(Code.Failure, SubCode.Exception, ex);
+            }
+
+            return res;
         }
 
         /// <summary>
@@ -32,9 +45,43 @@ namespace VDT.TransactionDaily.API.Controllers
         /// <returns></returns>
         /// created by vdthang 19.01.2022
         [HttpPut]
-        public ServiceResponse Update([FromBody] object updateModel)
+        public ServiceResponse Update([FromBody] T updateModel)
         {
-            return new ServiceResponse();
+            var res = new ServiceResponse();
+
+            try
+            {
+                res = BL.Update(updateModel);
+            }
+            catch (Exception ex)
+            {
+                res.OnError(Code.Failure, SubCode.Exception, ex);
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        /// API xóa
+        /// </summary>
+        /// <param name="updateModel"></param>
+        /// <returns></returns>
+        /// created by vdthang 24.01.2022
+        [HttpDelete]
+        public ServiceResponse Update([FromBody] List<string> ids)
+        {
+            var res = new ServiceResponse();
+
+            try
+            {
+                res = BL.Delete(ids);
+            }
+            catch (Exception ex)
+            {
+                res.OnError(Code.Failure, SubCode.Exception, ex);
+            }
+
+            return res;
         }
 
         /// <summary>
@@ -50,6 +97,28 @@ namespace VDT.TransactionDaily.API.Controllers
             try
             {
                 res.Data = BL.GetAll();
+            }
+            catch (Exception ex)
+            {
+                res.OnError(Code.Failure, SubCode.Exception, ex);
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        /// API lấy dữ liệu phân trang
+        /// </summary>
+        /// <returns></returns>
+        /// created by vdthang 24.01.2022
+        [HttpGet("Paging")]
+        public ServiceResponse GetPaging([FromQuery] int pageIndex, int pageSize, string query)
+        {
+            var res = new ServiceResponse();
+
+            try
+            {
+                res.Data = BL.GetPaging(pageIndex, pageSize, query);
             }
             catch (Exception ex)
             {
