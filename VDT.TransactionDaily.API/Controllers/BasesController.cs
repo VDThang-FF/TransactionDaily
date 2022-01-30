@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VDT.TransactionDaily.API.BL.Interfaces;
+using VDT.TransactionDaily.API.Helper;
 using VDT.TransactionDaily.API.Models;
 using VDT.TransactionDaily.API.Models.Enums;
 using VDT.TransactionDaily.API.Models.Responses;
@@ -21,14 +22,15 @@ namespace VDT.TransactionDaily.API.Controllers
         /// <returns></returns>
         /// created by vdthang 19.01.2022
         [HttpPost]
-        public ServiceResponse Insert([FromBody] T insertModel)
+        public ServiceResponse Insert([FromBody] object insertModel)
         {
             var res = new ServiceResponse();
 
             try
             {
-                insertModel.ModelState = Enumarations.ModelState.Insert;
-                res = BL.Insert(insertModel);
+                var parseModel = Converter.Deserialize<T>(insertModel.ToString());
+                parseModel.ModelState = Enumarations.ModelState.Insert;
+                res = BL.Insert(parseModel);
             }
             catch (Exception ex)
             {

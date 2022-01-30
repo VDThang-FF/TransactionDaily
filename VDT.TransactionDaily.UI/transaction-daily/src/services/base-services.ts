@@ -16,9 +16,30 @@ class BaseAPIS {
     /**
      * API lấy tất cả danh sách
      * created by vdthang 20.01.2022
+     * @returns
      */
     getAll(): Promise<any> {
         return _httpClient.get(this._subAPIUrl)
+    }
+
+    /**
+     * API thêm mới
+     * @param model
+     * @returns
+     * created by vdthang 30.01.2022 
+     */
+    insert(model: any): Promise<any> {
+        return _httpClient.post(this._subAPIUrl, model);
+    }
+
+    /**
+     * API cập nhật
+     * @param model 
+     * @returns 
+     * created by vdthang 30.01.2022
+     */
+    update(model: any): Promise<any> {
+        return _httpClient.put(this._subAPIUrl, model);
     }
 }
 

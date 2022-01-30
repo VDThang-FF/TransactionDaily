@@ -74,11 +74,7 @@ namespace VDT.TransactionDaily.API.Helper
                 deviceID = httpRequest.Cookies[CookieKey.DeviceID];
 
             if (string.IsNullOrWhiteSpace(deviceID))
-            {
                 deviceID = Guid.NewGuid().ToString();
-                if (httpResponse != null)
-                    Converter.AddCookie(httpResponse, CookieKey.DeviceID, deviceID);
-            }
 
             return deviceID;
         }
@@ -114,7 +110,7 @@ namespace VDT.TransactionDaily.API.Helper
                 }
 
                 if (httpResponse != null)
-                    Converter.AddCookie(httpResponse, CookieKey.DeviceName, deviceName);
+                    Converter.AddCookie(ref httpResponse, CookieKey.DeviceName, deviceName);
 
                 return deviceName;
             }

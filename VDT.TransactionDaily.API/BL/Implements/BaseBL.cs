@@ -42,7 +42,11 @@ namespace VDT.TransactionDaily.API.BL.Implements
         /// <returns></returns>
         public virtual IEnumerable<T> GetAll()
         {
-            return _entity.AsEnumerable();
+            return _entity
+                ?.Where(p => p.UserId == _userID)
+                ?.AsEnumerable()
+                ?.OrderByDescending(p => p.ModifiedDate)
+                ?.OrderByDescending(p => p.CreatedDate);
         }
 
         /// <summary>
@@ -156,6 +160,8 @@ namespace VDT.TransactionDaily.API.BL.Implements
                 entity.ModifiedBy = _userName;
                 entity.ModifiedDate = DateTime.UtcNow;
             }
+
+            entity.UserId = Convert.ToUInt32(_userID);
         }
     }
 }

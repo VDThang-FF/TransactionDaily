@@ -50,7 +50,11 @@
         </div>
     </div>
 
-    <DialogProduct v-model="modelProductDialog" :state="modelProductDialogState"></DialogProduct>
+    <DialogProduct
+        v-model="modelProductDialog"
+        :state="modelProductDialogState"
+        @saveForm="refreshProductDictionry"
+    ></DialogProduct>
 </template>
 
 <script setup lang="ts">
@@ -69,9 +73,7 @@ const rowPerPage = ref(10);
 const rowPerPageOption = ref([10, 25, 50]);
 const columns = [
     { field: 'Code', header: 'Mã sản phẩm', frozen: false },
-    { field: 'Name', header: 'Tên sản phẩm', frozen: false },
-    { field: 'CreatedDate', header: 'Ngày tạo', frozen: false },
-    { field: 'ModifiedDate', header: 'Ngày sửa', frozen: false }
+    { field: 'Name', header: 'Tên sản phẩm', frozen: false }
 ];
 const loading = ref(false);
 const selectedProducts = ref();
@@ -112,7 +114,7 @@ const refreshProductDictionry = () => {
 //#endregion
 
 //#region KHU VỰC HÀM DIALOG LOẠI SẢN PHẨM
-const modelProductDialog = ref(true);
+const modelProductDialog = ref(false);
 const modelProductDialogState = ENUM.ModelState.Insert;
 
 const openModalProductDictionary = () => {

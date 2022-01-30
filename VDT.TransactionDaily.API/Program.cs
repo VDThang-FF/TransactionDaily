@@ -56,11 +56,8 @@ var app = builder.Build();
 StartupParameter.Environment = app.Environment.EnvironmentName;
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("configcors");
 

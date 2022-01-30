@@ -38,9 +38,9 @@ namespace VDT.TransactionDaily.API.BLCore.Implements
             }
             else
             {
-                var userID = Converter.DecryptAES(_httpContextService.GetCookieByName(Enumarations.CookieKey.UserID));
-                var userName = Converter.DecryptAES(_httpContextService.GetCookieByName(Enumarations.CookieKey.UserName));
-                var email = Converter.DecryptAES(_httpContextService.GetCookieByName(Enumarations.CookieKey.Email));
+                var userID = Converter.DecryptAES(_httpContextService.GetHeaderByName(Enumarations.CookieKey.UserID));
+                var userName = Converter.DecryptAES(_httpContextService.GetHeaderByName(Enumarations.CookieKey.UserName));
+                var email = Converter.DecryptAES(_httpContextService.GetHeaderByName(Enumarations.CookieKey.Email));
 
                 return new VdtUser()
                 {
@@ -70,7 +70,7 @@ namespace VDT.TransactionDaily.API.BLCore.Implements
             }
             else
             {
-                var userID = Converter.DecryptAES(_httpContextService.GetCookieByName(Enumarations.CookieKey.UserID));
+                var userID = Converter.DecryptAES(_httpContextService.GetHeaderByName(Enumarations.CookieKey.UserID));
                 return Convert.ToUInt32(userID);
             }
         }
@@ -94,7 +94,7 @@ namespace VDT.TransactionDaily.API.BLCore.Implements
             }
             else
             {
-                return Converter.DecryptAES(_httpContextService.GetCookieByName(Enumarations.CookieKey.UserName));
+                return Converter.DecryptAES(_httpContextService.GetHeaderByName(Enumarations.CookieKey.UserName));
             }
         }
 
@@ -117,7 +117,7 @@ namespace VDT.TransactionDaily.API.BLCore.Implements
             }
             else
             {
-                return Converter.DecryptAES(_httpContextService.GetCookieByName(Enumarations.CookieKey.Email));
+                return Converter.DecryptAES(_httpContextService.GetHeaderByName(Enumarations.CookieKey.Email));
             }
         }
     }

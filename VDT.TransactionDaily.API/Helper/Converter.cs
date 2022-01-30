@@ -266,7 +266,7 @@ namespace VDT.TransactionDaily.API.Helper
         /// <param name="domain"></param>
         /// <param name="secure"></param>
         /// created by vdthang 17.01.2022
-        public static void AddCookie(HttpResponse response, string cookieName, string cookieValue, bool httpOnly = true, SameSiteMode sameSiteMode = SameSiteMode.Lax, DateTime? expire = null, string domain = null, bool secure = true)
+        public static void AddCookie(ref HttpResponse response, string cookieName, string cookieValue, bool httpOnly = true, SameSiteMode sameSiteMode = SameSiteMode.Lax, DateTime? expire = null, string domain = null, bool secure = true)
         {
             var option = new CookieOptions()
             {

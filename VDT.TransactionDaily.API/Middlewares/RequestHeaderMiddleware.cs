@@ -66,20 +66,12 @@ namespace VDT.TransactionDaily.API.Middlewares
             if (context.Request == null)
                 return false;
 
-            // Nếu là develop thì config session id mặc định
-            object sessionID = null;
-            if (StartupParameter.IsDevelopment())
-            {
-                sessionID = new Guid("00000000-0000-0000-0000-000000000001");
-            }
-            else
-            {
-                // Thực hiện đọc session id từ cookie
-                if (!context.Request.Cookies.ContainsKey(CookieKey.SessionID))
-                    return false;
+            // Thực hiện đọc session id từ cookie
+            if (!context.Request.Headers.ContainsKey(CookieKey.VDT))
+                return false;
 
-                sessionID = Converter.DecryptAES(context.Request.Cookies[CookieKey.SessionID].ToString());
-            }
+            var parseHeader = Converter.Deserialize<LoginResponse>(Convert.ToString(context.Request.Headers[CookieKey.VDT]));
+            var sessionID = Converter.DecryptAES(parseHeader.SessionID);
 
             if (string.IsNullOrWhiteSpace(Convert.ToString(sessionID)))
                 return false;
@@ -92,6 +84,11 @@ namespace VDT.TransactionDaily.API.Middlewares
 
             var accessToken = findBySessionID.AccessToken;
             context.Request.Headers.Authorization = "Bearer " + accessToken;
+            context.Request.Headers[CookieKey.SessionID] = parseHeader.SessionID;
+            context.Request.Headers[CookieKey.UserID] = parseHeader.UserID;
+            context.Request.Headers[CookieKey.UserName] = parseHeader.UserName;
+            context.Request.Headers[CookieKey.Email] = parseHeader.Email;
+            context.Request.Headers[CookieKey.DeviceID] = parseHeader.DeviceID;
 
             return true;
         }

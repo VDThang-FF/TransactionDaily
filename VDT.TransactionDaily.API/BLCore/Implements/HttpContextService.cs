@@ -33,6 +33,27 @@ namespace VDT.TransactionDaily.API.BLCore.Implements
         }
 
         /// <summary>
+        /// Lấy thông tin header qua name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// created by vdthang 27.01.2022
+        public string GetHeaderByName(string name)
+        {
+            try
+            {
+                if (GetCurrentRequest() != null)
+                    return Convert.ToString(GetCurrentRequest().Headers[name]);
+            }
+            catch (Exception)
+            {
+
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Lấy thông tin ngữ cảnh hiện tại
         /// </summary>
         /// <returns></returns>

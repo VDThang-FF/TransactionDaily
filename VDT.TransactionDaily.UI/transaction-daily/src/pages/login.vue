@@ -1,5 +1,4 @@
 <template>
-    <Toast position="top-center" />
     <div class="bg-white w-full p-4 vdt-border-1 lg:w-3">
         <p class="text-center text-primary font-bold text-xl mb-6">TRANSACTION DAILY</p>
         <form @submit.prevent="submitLogin(!v$.$invalid)" class="p-fluid">
@@ -35,10 +34,12 @@
             <Button class="w-full mb-5" label="Đăng nhập" type="submit" :loading="loading" />
         </form>
     </div>
+    <Toast position="top-center" />
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
+import { useCookies } from "vue3-cookies";
 import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import InputText from 'primevue/inputtext';
@@ -49,12 +50,14 @@ import { useToast } from "primevue/usetoast";
 import { useRouter } from 'vue-router';
 import AccountAPIS from '../services/accounts';
 import UserLogin from '../models/UserLogin';
+import ResponseUserLogin from '../models/ResponseUserLogin';
 import ServiceResponse from '../models/ServiceResponse';
 
 // Khởi tạo API Service
 const accountAPIS = new AccountAPIS('Accounts');
 
 // Khởi tạo param
+const { cookies } = useCookies();
 const submitted = ref(false);
 const loading = ref(false);
 const router = useRouter();
@@ -76,7 +79,7 @@ const v$ = useVuelidate(rules, state);
 const submitLogin = (isFormValid: Boolean) => {
     loading.value = true;
     submitted.value = true;
-    if (!isFormValid){
+    if (!isFormValid) {
         loading.value = false;
         return;
     }
@@ -84,11 +87,22 @@ const submitLogin = (isFormValid: Boolean) => {
     const userLogin: UserLogin = {
         UserName: state._userName,
         Password: state._passWord
-    };
+    }
 
     accountAPIS.login(userLogin).then((response) => {
         const responseData: ServiceResponse = response.data;
         if (responseData && responseData.Success) {
+            const dataLogin = responseData.Data as ResponseUserLogin;
+            // Xóa toàn bộ cookie cũ
+            cookies.keys().forEach(cookie => cookies.remove(cookie));
+
+            // Gán cookie
+            cookies.set("SessionID", dataLogin.SessionID);
+            cookies.set("UserID", dataLogin.UserID);
+            cookies.set("UserName", dataLogin.UserName);
+            cookies.set("Email", dataLogin.Email);
+            cookies.set("DeviceID", dataLogin.DeviceID);
+
             // Điều hướng vào màn hình chính
             router.push({ name: 'Product' });
         } else {

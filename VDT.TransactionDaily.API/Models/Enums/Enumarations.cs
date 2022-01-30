@@ -18,6 +18,7 @@
             public static string DeviceID = "DeviceID";
             public static string DeviceName = "DeviceName";
             public static string UserAgent = "User-Agent";
+            public static string VDT = "VDT";
         }
 
         public enum ModelState : int

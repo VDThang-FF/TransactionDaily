@@ -11,6 +11,14 @@
         string GetCookieByName(string name);
 
         /// <summary>
+        /// Lấy thông tin header qua name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// created by vdthang 27.01.2022
+        string GetHeaderByName(string name);
+
+        /// <summary>
         /// Lấy thông tin request hiện tại
         /// </summary>
         /// <returns></returns>

@@ -131,13 +131,14 @@ namespace VDT.TransactionDaily.API.BL.Implements
             if (effectInsert <= 0)
                 return res.OnError(Code.Success, SubCode.ErrorInsert, devMessage: "Không thêm mới được bản ghi session");
 
-            // Gán cookie đăng nhập
-            Converter.AddCookie(currentResponse, CookieKey.SessionID, Converter.EncryptAES(sessionModel.Id.ToString()));
-            Converter.AddCookie(currentResponse, CookieKey.UserID, Converter.EncryptAES(findByUserName.Id.ToString()));
-            Converter.AddCookie(currentResponse, CookieKey.UserName, Converter.EncryptAES(findByUserName.UserName));
-            Converter.AddCookie(currentResponse, CookieKey.Email, Converter.EncryptAES(findByUserName.Email));
-
-            return res.OnSuccess(userToken);
+            return res.OnSuccess(new LoginResponse()
+            {
+                SessionID = Converter.EncryptAES(sessionModel.Id.ToString()),
+                UserID = Converter.EncryptAES(findByUserName.Id.ToString()),
+                UserName = Converter.EncryptAES(findByUserName.UserName),
+                Email = Converter.EncryptAES(findByUserName.Email),
+                DeviceID = deviceID
+            });
         }
 
         /// <summary>

@@ -11,8 +11,7 @@ namespace VDT.TransactionDaily.API.Models
         /// <summary>
         /// ID người dùng
         /// </summary>
-        [NotMapped]
-        public uint UserId { get; set; }    
+        public virtual uint UserId { get; set; }
 
         /// <summary>
         /// State model
@@ -23,22 +22,22 @@ namespace VDT.TransactionDaily.API.Models
         /// <summary>
         /// Ngày tạo
         /// </summary>
-        public DateTime? CreatedDate { get; set; }
+        public virtual DateTime? CreatedDate { get; set; }
 
         /// <summary>
         /// Người tạo
         /// </summary>
-        public string? CreatedBy { get; set; }
+        public virtual string? CreatedBy { get; set; }
 
         /// <summary>
         /// Ngày sửa
         /// </summary>
-        public DateTime? ModifiedDate { get; set; }
+        public virtual DateTime? ModifiedDate { get; set; }
 
         /// <summary>
         /// Người sửa
         /// </summary>
-        public string? ModifiedBy { get; set; }
+        public virtual string? ModifiedBy { get; set; }
 
         /// <summary>
         /// Lấy loại khóa chính
