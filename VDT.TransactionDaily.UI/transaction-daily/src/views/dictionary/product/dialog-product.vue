@@ -43,7 +43,7 @@
             >Tên sản phẩm không được để trống</p>
         </div>
         <template #footer>
-            <Button label="Đóng" icon="pi pi-times" @click="closeDialog" class="p-button-text" />
+            <Button label="Đóng" icon="pi pi-times" @click="closeDialog" class="p-button-text p-button-plain" />
             <Button
                 v-if="state == ENUM.ModelState.Insert"
                 label="Thêm mới"

@@ -70,13 +70,13 @@ namespace VDT.TransactionDaily.API.Controllers
         /// <returns></returns>
         /// created by vdthang 24.01.2022
         [HttpDelete]
-        public ServiceResponse Update([FromBody] List<string> ids)
+        public ServiceResponse Delete([FromBody] List<string> ids)
         {
             var res = new ServiceResponse();
 
             try
             {
-                res = BL.Delete(ids);
+                res = BL.Delete<T>(ids);
             }
             catch (Exception ex)
             {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VDT.TransactionDaily.API.BL.Interfaces;
 using VDT.TransactionDaily.API.BLCore.Interfaces;
+using VDT.TransactionDaily.API.Helper;
 using VDT.TransactionDaily.API.Models;
 using VDT.TransactionDaily.API.Models.Others;
 using VDT.TransactionDaily.API.Models.Responses;
@@ -122,9 +123,21 @@ namespace VDT.TransactionDaily.API.BL.Implements
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         /// created by vdthang 24.01.2022
-        public virtual ServiceResponse Delete(List<string> ids)
+        public virtual ServiceResponse Delete<T>(List<string> ids)
         {
-            throw new NotImplementedException();
+            var res = new ServiceResponse();
+            if (ids == null || ids.Count == 0)
+                return res;
+
+            var findByIDs = _entity
+                ?.Where(p => ids.Contains(p.Id.ToString()))
+                ?.AsEnumerable();
+            _entity.RemoveRange(findByIDs);
+            var effect = _dbContext.SaveChanges();
+            if (effect <= 0)
+                return res.OnError(Code.Success, SubCode.ErrorDelete);
+
+            return res;
         }
 
         /// <summary>

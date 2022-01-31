@@ -9,6 +9,12 @@ namespace VDT.TransactionDaily.API.Models
     public class BaseModel
     {
         /// <summary>
+        /// Khóa chính
+        /// </summary>
+        [NotMapped]
+        public virtual uint Id { get; set; }
+
+        /// <summary>
         /// ID người dùng
         /// </summary>
         public virtual uint UserId { get; set; }

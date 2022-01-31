@@ -1,4 +1,5 @@
-﻿using static VDT.TransactionDaily.API.Models.Enums.Enumarations;
+﻿using VDT.TransactionDaily.API.Helper;
+using static VDT.TransactionDaily.API.Models.Enums.Enumarations;
 
 namespace VDT.TransactionDaily.API.Models.Responses
 {
@@ -48,7 +49,7 @@ namespace VDT.TransactionDaily.API.Models.Responses
             this.Success = false;
             this.Code = code;
             this.SubCode = subCode;
-            this.Data = data;
+            this.Data = Converter.Serialize(data);
             this.Message = message;
             this.DevMessage = devMessage;
 

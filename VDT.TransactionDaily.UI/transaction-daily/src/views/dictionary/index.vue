@@ -1,9 +1,21 @@
 <template>
-    <div id="vdt-content-dictionary" class="h-full bg-white overflow-auto px-2 pt-3 pb-2 md:p-3">
-        <div class="vdt-section-product border-bottom-1 border-gray-100 pb-3 md:p-3">
-            <div class="flex align-items-center">
+    <div id="vdt-content-dictionary" class="h-full bg-white overflow-auto p-3 md:p-4">
+        <div class="vdt-section-product h-full">
+            <div class="flex align-items-center vdt-height-10">
                 <p class="text-primary font-bold text-xl mr-4 my-0">Loại sản phẩm</p>
-                <Button label="Thêm mới" icon="pi pi-plus" @click="openModalProductDictionary" />
+                <Button
+                    v-if="selectedProducts == null || selectedProducts.length == 0"
+                    label="Thêm mới"
+                    icon="pi pi-plus"
+                    @click="openAddDialogProductDictionary"
+                />
+                <Button
+                    v-else
+                    label="Xóa"
+                    class="p-button-danger"
+                    icon="pi pi-trash"
+                    @click="openConfirmDeleteProductDictionary"
+                />
             </div>
             <div class="vdt-box-table border-1 border-solid border-gray-50 mt-3">
                 <div
@@ -19,7 +31,7 @@
                     :rowsPerPageOptions="rowPerPageOption"
                     :rowHover="true"
                     :loading="loading"
-                    data-key="id"
+                    data-key="Id"
                     scrollHeight="flex"
                     scrollDirection="both"
                     class="bg-white"
@@ -36,25 +48,47 @@
                             @click="refreshProductDictionry"
                         />
                     </template>
-                    <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+                    <Column selectionMode="multiple" headerStyle="width: 44px"></Column>
                     <Column
                         v-for="col of columns"
                         :field="col.field"
                         :header="col.header"
                         :key="col.field"
                         :frozen="col.frozen"
-                        style="flex-grow:1; flex-basis:200px"
+                        :style="col.style"
                     ></Column>
+                    <Column
+                        :exportable="false"
+                        style="min-width: 110px; display: flex; justify-content: center;"
+                    >
+                        <template #body="slotProps">
+                            <Button
+                                icon="pi pi-pencil"
+                                class="p-button-outlined p-button-rounded mr-2"
+                            />
+                            <Button
+                                icon="pi pi-trash"
+                                class="p-button-outlined p-button-rounded p-button-danger"
+                            />
+                        </template>
+                    </Column>
                 </DataTable>
             </div>
         </div>
     </div>
 
+    <!-- Dialog thêm mới/chỉnh sửa loại sản phẩm -->
     <DialogProduct
         v-model="modelProductDialog"
         :state="modelProductDialogState"
         @saveForm="refreshProductDictionry"
     ></DialogProduct>
+
+    <!-- Dialog confirm khi xóa danh mục -->
+    <ConfirmDialog></ConfirmDialog>
+
+    <!-- Toast thông báo -->
+    <Toast position="top-center" />
 </template>
 
 <script setup lang="ts">
@@ -62,6 +96,10 @@ import { ref } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
+import ConfirmDialog from 'primevue/confirmdialog';
+import { useConfirm } from "primevue/useconfirm";
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 import DialogProduct from './product/dialog-product.vue';
 import ProductDictionaryAPIS from '@/services/product-dictionary';
 import ServiceResponse from '@/models/ServiceResponse';
@@ -69,14 +107,16 @@ import ENUM from '@/scripts/enums';
 
 //#region KHU VỰC HÀM DÀNH CHO MÀN HÌNH DANH SÁCH DANH MỤC SẢN PHẨM
 // Variable table danh mục sản phẩm
+const confirm = useConfirm();
+const toast = useToast();
 const rowPerPage = ref(10);
 const rowPerPageOption = ref([10, 25, 50]);
 const columns = [
-    { field: 'Code', header: 'Mã sản phẩm', frozen: false },
-    { field: 'Name', header: 'Tên sản phẩm', frozen: false }
+    { field: 'Code', header: 'Mã sản phẩm', frozen: false, style: 'flex-grow:1; flex-basis:100px' },
+    { field: 'Name', header: 'Tên sản phẩm', frozen: false, style: 'flex-grow:1; flex-basis:100px' }
 ];
 const loading = ref(false);
-const selectedProducts = ref();
+const selectedProducts = ref([]);
 const dictionaryProducts = ref([]);
 
 // Lấy dữ liệu danh sách danh mục sản phẩm
@@ -109,7 +149,7 @@ const refreshProductDictionry = () => {
             dictionaryProducts.value = [];
         };
         loading.value = false;
-    })
+    });
 }
 //#endregion
 
@@ -117,8 +157,40 @@ const refreshProductDictionry = () => {
 const modelProductDialog = ref(false);
 const modelProductDialogState = ENUM.ModelState.Insert;
 
-const openModalProductDictionary = () => {
+// Mở dialog thêm mới
+const openAddDialogProductDictionary = () => {
     modelProductDialog.value = true;
+};
+
+// Mở dialog xóa
+const openConfirmDeleteProductDictionary = () => {
+    confirm.require({
+        message: 'Bạn có chắc chắn muốn xóa bản ghi được chọn không?',
+        header: 'Xóa dữ liệu',
+        icon: 'pi pi-info-circle',
+        accept: () => {
+            loading.value = true;
+            // Gọi service xóa 
+            const ids = selectedProducts.value.map((obj) => obj.Id + '');
+            _productDictionaryAPIS.delete(ids).then((response: any) => {
+                const responseData: ServiceResponse = response.data;
+                if (responseData && responseData.Success) {
+                    toast.add({ severity: 'success', summary: 'Xóa thành công', life: 3000 });
+                    selectedProducts.value = [];
+                    refreshProductDictionry();
+                } else {
+                    toast.add({ severity: 'error', summary: 'Xóa thất bại', detail: responseData.Message, life: 3000 });
+                }
+                loading.value = false;
+            });
+        },
+        acceptLabel: 'Có',
+        rejectLabel: 'Không',
+        acceptClass: 'p-button-danger mr-0',
+        rejectClass: 'p-button-text p-button-plain',
+        acceptIcon: 'pi pi-check',
+        rejectIcon: 'pi pi-times'
+    });
 };
 //#endregion
 </script>
@@ -127,7 +199,8 @@ const openModalProductDictionary = () => {
 #vdt-content-dictionary {
     .vdt-section-product {
         .vdt-box-table {
-            height: 400px;
+            // height: 400px;
+            height: calc(100% - 56px);
         }
     }
 }

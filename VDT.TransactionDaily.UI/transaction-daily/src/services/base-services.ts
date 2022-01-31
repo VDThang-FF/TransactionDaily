@@ -41,6 +41,18 @@ class BaseAPIS {
     update(model: any): Promise<any> {
         return _httpClient.put(this._subAPIUrl, model);
     }
+
+    /**
+     * API xóa
+     * @param ids
+     * @returns 
+     * created by vdthang 31.01.2022
+     */
+    delete(ids: any): Promise<any> {
+        return _httpClient.delete(this._subAPIUrl, {
+            data: ids
+        });
+    }
 }
 
 export default BaseAPIS;

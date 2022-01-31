@@ -34,6 +34,8 @@
             <Button class="w-full mb-5" label="Đăng nhập" type="submit" :loading="loading" />
         </form>
     </div>
+
+    <!-- Toast thông báo -->
     <Toast position="top-center" />
 </template>
 

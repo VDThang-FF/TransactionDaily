@@ -19,7 +19,7 @@ namespace VDT.TransactionDaily.API.Models
         /// Khóa chính
         /// </summary>
         [Key]
-        public uint Id { get; set; }
+        public override uint Id { get => base.Id; set => base.Id = value; }
 
         /// <summary>
         /// Mã danh mục

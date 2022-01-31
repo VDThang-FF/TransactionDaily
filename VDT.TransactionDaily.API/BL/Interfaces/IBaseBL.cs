@@ -60,6 +60,6 @@ namespace VDT.TransactionDaily.API.BL.Interfaces
         /// <param name="ids"></param>
         /// <returns></returns>
         /// created by vdthang 20.01.2022
-        ServiceResponse Delete(List<string> ids);
+        ServiceResponse Delete<T>(List<string> ids);
     }
 }

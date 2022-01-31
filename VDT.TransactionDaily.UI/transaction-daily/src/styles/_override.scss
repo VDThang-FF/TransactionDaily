@@ -3,3 +3,7 @@
     border-bottom: none !important;
     border-top: 1px solid var(--gray-50) !important;
 }
+
+.p-datatable .p-datatable-thead > tr > th{
+    background: var(--surface-50) !important;
+}
